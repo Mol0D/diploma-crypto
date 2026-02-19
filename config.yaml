@@ -1,0 +1,51 @@
+data:
+  out_dir: data
+  prices_file: data/prices_1h.csv
+  dataset_file: data/dataset_1h.csv
+  news_file: data/news_gdelt.csv
+  event_features_file: data/event_features_1h.csv
+  fear_greed_file: "data/fear_greed.csv"
+  fg_features_file: "data/fg_features.csv"
+
+prices:
+  symbols: ["BTC", "ETH"]
+  currency: "USD"
+  # Data source note:
+  # CoinGecko's free endpoint may return HTTP 401 (Unauthorized) due to policy/rate-limit changes.
+  # Default to CryptoCompare (no key required for basic usage) as a more stable source.
+  source: "cryptocompare"   # "cryptocompare" | "coingecko"
+  days: 730               # last N days (smaller => fewer rate-limit issues)
+
+events:
+  source: "gdelt"
+  # GDELT often rejects overly common single-term queries; use a slightly more specific query.
+  # If you later set search_mode: "title", GDELT may reject very common tokens like "title:bitcoin".
+  # Quoted phrases tend to work better for title-only searches.
+  keywords_btc: "(\"bitcoin price\" OR \"BTC price\" OR \"Bitcoin ETF\")"
+  keywords_eth: "\"ethereum price\" OR \"ETH price\" OR \"Ethereum ETF\""
+  language: "english"        # GDELT sourcelang filter; keeps only English sources
+  days: 30
+  search_mode: "title"   # "title" | "full"
+
+dataset:
+  horizon_hours: 4     # predict r_{t,Delta} with Delta=4h by default
+  lags: [1, 2, 4, 8, 12, 24]
+  rolling_windows: [6, 12, 24, 72]
+
+model:
+  quantiles: [0.05, 0.50, 0.95]
+  lgbm_params:
+    n_estimators: 800
+    learning_rate: 0.03
+    num_leaves: 31
+    min_child_samples: 50
+    subsample: 0.8
+    colsample_bytree: 0.8
+    random_state: 42
+
+eval:
+  n_splits: 5
+  test_size: 168       # 7 days of hourly data
+  gap: 0
+  plots_dir: reports
+  models_dir: models
