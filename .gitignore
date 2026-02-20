@@ -1,0 +1,24 @@
+# Віртуальне середовище
+venv/
+.venv/
+
+# Python кеш
+__pycache__/
+*.pyc
+
+# IDE та редактори
+.vscode/
+.idea/
+*.swp
+
+# Змінні оточення
+.env
+
+# Пакети
+dist/
+build/
+*.egg-info/
+
+# Тести
+.pytest_cache/
+.coverage
