@@ -28,7 +28,7 @@ events:
   search_mode: "title"   # "title" | "full"
 
 dataset:
-  horizon_hours: 4     # predict r_{t,Delta} with Delta=4h by default
+  horizon_hours: [1, 4]     # predict r_{t,Delta} with Delta=4h by default
   lags: [1, 2, 4, 8, 12, 24]
   rolling_windows: [6, 12, 24, 72]
 

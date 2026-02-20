@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Run the full pipeline from within the code/ directory.
+# Run the full pipeline (supports multiple horizons via config.yaml).
 # Usage:
 #   cd code
 #   bash run_all.sh
@@ -24,15 +24,17 @@ echo "1) Fetch prices"
 python3 01_fetch_prices.py --config "${CONFIG}"
 
 echo "2) Fetch news (GDELT)"
-python3 05_fetch_news_gdelt.py --config "${CONFIG}" --maxrecords "${MAXRECORDS}" --sleep "${SLEEP}" --retries "${RETRIES}" --backoff "${BACKOFF}"
+python3 05_fetch_news_gdelt.py --config "${CONFIG}" \
+  --maxrecords "${MAXRECORDS}" --sleep "${SLEEP}" \
+  --retries "${RETRIES}" --backoff "${BACKOFF}"
 
 echo "3) Build event features (VADER + FinBERT)"
 python3 06_make_event_features.py --config "${CONFIG}"
 
-echo "4) Build merged dataset"
+echo "4) Build merged dataset (all horizons)"
 python3 02_make_dataset.py --config "${CONFIG}"
 
-echo "5) Compare feature sets (market vs events vs combined)"
+echo "5) Compare feature sets for all horizons"
 python3 07_compare_feature_sets.py --config "${CONFIG}"
 
 echo "Done. Check ../data and ../reports"
