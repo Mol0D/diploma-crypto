@@ -11,6 +11,7 @@ def main():
     fg = pd.read_csv(cfg["data"].get("fear_greed_file", "data/fear_greed.csv"))
     fg["timestamp"] = pd.to_datetime(fg["timestamp"], utc=True)
     fg = fg.sort_values("timestamp").drop_duplicates(subset=["timestamp"])
+    fg = fg.drop(columns=["fear_greed_class"], errors="ignore")
 
     # Розширюємо на годинну сітку
     hourly_index = pd.date_range(
@@ -36,8 +37,8 @@ def main():
     fg_hourly["fg_delta24h"] = fg_hourly["fear_greed"] - fg_hourly["fg_lag24h"]
 
     # Бінарні ознаки режиму
-    fg_hourly["fg_extreme_fear"] = (fg_hourly["fear_greed"] <= 25).astype(int)
-    fg_hourly["fg_greed"]        = (fg_hourly["fear_greed"] >= 60).astype(int)
+    fg_hourly["fg_extreme_fear"] = (fg_hourly["fear_greed"] <= 20).astype(int)
+    fg_hourly["fg_greed"]        = (fg_hourly["fear_greed"] >= 80).astype(int)
 
     # Додаємо symbol — потрібно для merge з датасетом
     rows = []

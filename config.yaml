@@ -29,7 +29,7 @@ events:
 
 dataset:
   horizon_hours: [1, 4]     # predict r_{t,Delta} with Delta=4h by default
-  lags: [1, 2, 4, 8, 12, 24]
+  lags: [1, 2, 3, 4, 6, 8, 12, 24]
   rolling_windows: [6, 12, 24, 72]
 
 model:
@@ -45,7 +45,7 @@ model:
 
 eval:
   n_splits: 5
-  test_size: 168       # 7 days of hourly data
+  test_size: 500
   gap: 0
   plots_dir: reports
   models_dir: models
