@@ -20,6 +20,22 @@ def add_rolling(df: pd.DataFrame, col: str, windows: List[int]) -> None:
         df[f"{col}_roll_std{w}"] = df[col].rolling(w).std()
 
 
+def add_rsi(df: pd.DataFrame, price_col: str, period: int = 14) -> None:
+    """RSI на основі погодинних цін закриття."""
+    delta = df[price_col].diff()
+    gain = delta.clip(lower=0).rolling(period).mean()
+    loss = (-delta.clip(upper=0)).rolling(period).mean()
+    rs = gain / loss.replace(0, np.nan)
+    df[f"rsi_{period}"] = 100 - (100 / (1 + rs))
+
+
+def add_ema_diff(df: pd.DataFrame, price_col: str, fast: int = 12, slow: int = 26) -> None:
+    """Нормалізована різниця EMA(fast) - EMA(slow), поділена на ціну."""
+    ema_fast = df[price_col].ewm(span=fast, adjust=False).mean()
+    ema_slow = df[price_col].ewm(span=slow, adjust=False).mean()
+    df[f"ema_diff_{fast}_{slow}"] = (ema_fast - ema_slow) / df[price_col]
+
+
 def make_symbol_dataset(prices: pd.DataFrame, sym: str, cfg: dict) -> pd.DataFrame:
     pcol = f"price_{sym}"
     # Support both single horizon (int) and multiple horizons (list)
@@ -40,6 +56,8 @@ def make_symbol_dataset(prices: pd.DataFrame, sym: str, cfg: dict) -> pd.DataFra
 
     add_lags(df, "r_1h", lags)
     add_rolling(df, "r_1h", windows)
+    add_rsi(df, pcol, period=14)
+    add_ema_diff(df, pcol, fast=12, slow=26)
 
     df["symbol"] = sym
     return df
